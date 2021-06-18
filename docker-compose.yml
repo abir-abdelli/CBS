@@ -1,0 +1,46 @@
+version: "3.2"
+services:
+  nodejs:
+    build: 
+      context: .
+    image: cbs-app
+    networks:
+      - frontend
+      - backend
+    environment:
+      - MYSQL_HOST=mysql-app-CBS
+      - MYSQL_USER=myuser
+      - MYSQL_PASS=mypass
+      - MYSQL_DB=bank_db
+    volumes:
+      - ./www/:/var/www/html/
+    ports:
+      - "30001:8005"
+    container_name: CBS-app
+  mysql:
+    image: mysql:5.7
+    networks:
+      - backend
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_USER=myuser
+      - MYSQL_PASSWORD=mypass
+      - MYSQL_DATABASE=bank_db
+    container_name: mysql-app-CBS
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    depends_on:
+      - mysql
+    networks:
+      - backend
+    ports:
+      - "30002:80"
+    environment:
+      - PMA_HOST=mysql-app-CBS
+      - PMA_PORT= 3306
+    volumes:
+      - /sessions
+    container_name: phpmyadmin-app-CBS
+networks:
+  frontend:
+  backend:
